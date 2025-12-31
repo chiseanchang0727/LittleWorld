@@ -1,5 +1,9 @@
+from world import World
+
+
 def main():
-    print("Hello from littleworld!")
+    world = World()
+    world.run()
 
 
 if __name__ == "__main__":
