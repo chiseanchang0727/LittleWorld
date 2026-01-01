@@ -1,0 +1,5 @@
+# Minimal configuration (only required fields)
+window:
+  width: 640
+  height: 480
+

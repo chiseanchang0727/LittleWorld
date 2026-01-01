@@ -1,20 +1,43 @@
 import pygame
 import random
-from config import (
-    CHARACTER_RADIUS, CHARACTER_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT,
-    PLAYER_COLOR, AI_CHARACTER_COLOR
-)
+from typing import Optional
+from config import LittleWorldConfig, CharacterConfig, ColorsConfig, WindowConfig
 from decisions import Decision, ActionType
 
 
 class Character:
     """Base character class"""
-    def __init__(self, x, y, color):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        color: tuple[int, int, int],
+        config: LittleWorldConfig,
+        character_config: Optional[CharacterConfig] = None,
+        window_config: Optional[WindowConfig] = None,
+    ):
+        """
+        Initialize character.
+        
+        Args:
+            x: Initial x position
+            y: Initial y position
+            color: Character color (RGB tuple)
+            config: Configuration object (required, dependency injection)
+            character_config: Character-specific config. If None, uses config.character
+            window_config: Window config. If None, uses config.window
+        """
         self.x = x
         self.y = y
-        self.radius = CHARACTER_RADIUS
-        self.speed = CHARACTER_SPEED
         self.color = color
+        self.config = config
+        
+        # Use provided character config or default from main config
+        self.character_config = character_config or config.character
+        self.window_config = window_config or config.window
+        
+        self.radius = self.character_config.radius
+        self.speed = self.character_config.speed
 
     def move(self, dx, dy):
         """Move the character by dx, dy, keeping within screen bounds"""
@@ -22,11 +45,11 @@ class Character:
         new_y = self.y + dy
         
         # Keep character within screen boundaries
-        new_x = max(self.radius, min(WINDOW_WIDTH - self.radius, new_x))
-        new_y = max(self.radius, min(WINDOW_HEIGHT - self.radius, new_y))
+        new_x = max(self.radius, min(self.window_config.width - self.radius, new_x))
+        new_y = max(self.radius, min(self.window_config.height - self.radius, new_y))
         
         self.x = new_x
-        self.y = new_y #test
+        self.y = new_y
 
     def update(self):
         """Update character state - override in subclasses"""
@@ -39,8 +62,24 @@ class Character:
 
 class PlayerCharacter(Character):
     """Player-controlled character"""
-    def __init__(self, x, y):
-        super().__init__(x, y, PLAYER_COLOR)
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        config: LittleWorldConfig,
+        color: Optional[tuple[int, int, int]] = None,
+    ):
+        """
+        Initialize player character.
+        
+        Args:
+            x: Initial x position
+            y: Initial y position
+            config: Configuration object (required, dependency injection)
+            color: Character color. If None, uses config.colors.player
+        """
+        color = color or config.colors.player
+        super().__init__(x, y, color, config=config)
 
     def handle_input(self, keys):
         """Handle keyboard input for movement"""
@@ -62,8 +101,26 @@ class PlayerCharacter(Character):
 
 class AICharacter(Character):
     """AI-controlled character"""
-    def __init__(self, x, y):
-        super().__init__(x, y, AI_CHARACTER_COLOR)
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        config: LittleWorldConfig,
+        color: Optional[tuple[int, int, int]] = None,
+        character_config: Optional[CharacterConfig] = None,
+    ):
+        """
+        Initialize AI character.
+        
+        Args:
+            x: Initial x position
+            y: Initial y position
+            config: Configuration object (required, dependency injection)
+            color: Character color. If None, uses config.colors.ai_character
+            character_config: Character-specific config. If None, uses config.character
+        """
+        color = color or config.colors.ai_character
+        super().__init__(x, y, color, config=config, character_config=character_config)
         self.direction_change_timer = 0
         self.current_dx = 0
         self.current_dy = 0

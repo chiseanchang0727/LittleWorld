@@ -1,0 +1,34 @@
+# Window settings
+window:
+  width: 800
+  height: 600
+
+# Colors (RGB tuples)
+colors:
+  ground: [144, 238, 144]  # Light green
+  world_background: [144, 238, 144]
+  character: [219, 112, 147]  # Darker pink
+  player: [219, 112, 147]  # Pink for player
+  ai_character: [255, 165, 0]  # Orange for AI character
+
+# Character settings
+character:
+  radius: 20
+  speed: 5  # Pixels per frame
+
+# Game loop settings
+game:
+  fps: 60
+
+# Character instance configurations
+characters:
+  player_a:
+    name: "Player A"
+    # Player characters don't need LLM config
+  
+  ai_character_a:
+    name: "AI Character A"
+    llm:
+      type: openai
+      version: gpt-4o
+      api_key: ${OPENAI_API_KEY}

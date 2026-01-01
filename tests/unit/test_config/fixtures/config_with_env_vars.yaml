@@ -1,0 +1,27 @@
+# Configuration with environment variables
+window:
+  width: 800
+  height: 600
+
+colors:
+  ground: [144, 238, 144]
+  world_background: [144, 238, 144]
+  character: [219, 112, 147]
+  player: [219, 112, 147]
+  ai_character: [255, 165, 0]
+
+character:
+  radius: 20
+  speed: 5
+
+game:
+  fps: 60
+
+characters:
+  test_ai:
+    name: "Test AI with Env Var"
+    llm:
+      type: openai
+      version: gpt-4o
+      api_key: ${TEST_API_KEY}
+

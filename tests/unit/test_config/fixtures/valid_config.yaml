@@ -1,0 +1,30 @@
+# Valid test configuration
+window:
+  width: 1000
+  height: 800
+
+colors:
+  ground: [100, 200, 100]
+  world_background: [100, 200, 100]
+  character: [255, 0, 0]
+  player: [0, 255, 0]
+  ai_character: [0, 0, 255]
+
+character:
+  radius: 25
+  speed: 10
+
+game:
+  fps: 30
+
+characters:
+  test_player:
+    name: "Test Player"
+  
+  test_ai:
+    name: "Test AI"
+    llm:
+      type: openai
+      version: gpt-4o
+      api_key: test_api_key_12345
+

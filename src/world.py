@@ -1,21 +1,41 @@
 import pygame
-from config import WINDOW_WIDTH, WINDOW_HEIGHT, GROUND_COLOR, FPS
-from character import PlayerCharacter, AICharacter
+from config import LittleWorldConfig, load_config
+from character import CharacterFactory
 
 
 class World:
-    def __init__(self):
+    def __init__(self, config: LittleWorldConfig | None = None):
+        """
+        Initialize world.
+        
+        Args:
+            config: Configuration object. If None, loads from YAML.
+        """
+        # Load config if not provided (dependency injection)
+        if config is None:
+            config = load_config()
+        self.config = config
+        
+        # Create character factory with config
+        self.character_factory = CharacterFactory(config)
+        
         pygame.init()
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.screen = pygame.display.set_mode((config.window.width, config.window.height))
         pygame.display.set_caption("LittleWorld")
         self.clock = pygame.time.Clock()
         self.running = True
         
-        # Create player character (left side)
-        self.player = PlayerCharacter(WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
+        # Create player character (left side) using factory
+        self.player = self.character_factory.create_player(
+            config.window.width // 4,
+            config.window.height // 2,
+        )
         
-        # Create AI character (right side)
-        self.ai_character = AICharacter(3 * WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
+        # Create AI character (right side) using factory
+        self.ai_character = self.character_factory.create_ai(
+            3 * config.window.width // 4,
+            config.window.height // 2,
+        )
         
         # List of all characters
         self.characters = [self.player, self.ai_character]
@@ -41,7 +61,7 @@ class World:
     def render(self):
         """Render the world"""
         # Fill screen with ground color
-        self.screen.fill(GROUND_COLOR)
+        self.screen.fill(self.config.colors.ground)
         
         # Render all characters
         for character in self.characters:
@@ -56,7 +76,7 @@ class World:
             self.handle_events()
             self.update()
             self.render()
-            self.clock.tick(FPS)
+            self.clock.tick(self.config.game.fps)
         
         pygame.quit()
 
