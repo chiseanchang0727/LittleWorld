@@ -2,13 +2,10 @@
 from pydantic import BaseModel
 from src.language_model.base import LLMBase
 from src.language_model.providers.provider_factory import create_llm_instance
-from km.config.models.language_model_config import LLMConfig
+from src.config.models.character_config import LLMConfig
 from langchain_core.runnables import Runnable
-
 from openai import AsyncOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
-
-
 
 class OpenAIEngine(LLMBase):
     def __init__(self, llm):
