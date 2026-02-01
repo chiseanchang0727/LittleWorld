@@ -6,7 +6,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.runnables import Runnable
 from openai import OpenAI, AsyncOpenAI
 from dotenv import load_dotenv
-from src.config.enum import Provider
+from config.enum import Provider
 
 def create_llm_instance(config) -> Runnable:
     load_dotenv()

@@ -1,8 +1,18 @@
+from optparse import Option
+from token import OP
 import pygame
 import random
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from config import LittleWorldConfig, CharacterConfig, ColorsConfig, WindowConfig
 from decisions import Decision, ActionType
+
+if TYPE_CHECKING:
+    from world.world_state import WorldState
+    from language_model.llm_base_engine import BaseAIModelEngine
+
+# Forward reference to avoid circular import
+if TYPE_CHECKING:
+    from world import World
 
 
 class Character:
@@ -80,6 +90,7 @@ class PlayerCharacter(Character):
         """
         color = color or config.colors.player
         super().__init__(x, y, color, config=config)
+        self.name = "Player"  # Default name, can be set from config later
 
     def handle_input(self, keys):
         """Handle keyboard input for movement"""
@@ -108,6 +119,10 @@ class AICharacter(Character):
         config: LittleWorldConfig,
         color: Optional[tuple[int, int, int]] = None,
         character_config: Optional[CharacterConfig] = None,
+        vision_radius: Optional[float] = None,
+        world: Optional["World"] = None,
+        model: Optional["BaseAIModelEngine"] = None,
+        personality: Optional[str] = None,
     ):
         """
         Initialize AI character.
@@ -118,16 +133,39 @@ class AICharacter(Character):
             config: Configuration object (required, dependency injection)
             color: Character color. If None, uses config.colors.ai_character
             character_config: Character-specific config. If None, uses config.character
+            vision_radius: Vision radius in pixels. If None, uses default 200.0
+            world: Optional reference to World (for initiative observation mode)
+            model: Optional LLM model engine (BaseAIModelEngine) for AI decision making
+            personality: Optional personality text for the character
         """
         color = color or config.colors.ai_character
         super().__init__(x, y, color, config=config, character_config=character_config)
+        self.vision_radius = vision_radius or 200.0
+        self.world = world
+        self.model = model  # LLM model for decision making
+        self.personality = personality  # Character personality text
+        self.name = "AI Character"  # Default name, can be set from config later
         self.direction_change_timer = 0
         self.current_dx = 0
         self.current_dy = 0
 
-    def update(self):
-        """Update AI character - moves randomly"""
-        # Change direction every 60 frames (about 1 second at 60 FPS)
+    def update(self, world_state: Optional["WorldState"] = None):
+        """
+        Update AI character.
+        
+        Args:
+            world_state: Optional world state observation (passive mode).
+                        If None and world reference exists, will query world (initiative mode).
+        """
+        # For now, keep random movement as fallback
+        # Later, this will use make_decision() with world_state
+        if world_state is None:
+            # Initiative mode: query world if available
+            if self.world is not None:
+                world_state = self.get_observation()
+        
+        # TODO: Use world_state with make_decision() when LLM is integrated
+        # For now, continue with random movement
         self.direction_change_timer += 1
         if self.direction_change_timer >= 60:
             # Randomly choose a direction
@@ -144,6 +182,29 @@ class AICharacter(Character):
         # Move in current direction
         if self.current_dx != 0 or self.current_dy != 0:
             self.move(self.current_dx, self.current_dy)
+    
+    def get_observation(self) -> Optional["WorldState"]:
+        """
+        Get world state observation (initiative mode - character queries world).
+        
+        Returns:
+            WorldState object if world reference exists, None otherwise
+        """
+        if self.world is None:
+            return None
+        return self.world.get_world_state_for(self, self.vision_radius)
+    
+    def format_observation(self, world_state: "WorldState") -> dict:
+        """
+        Format world state as structured observation for LLM.
+        
+        Args:
+            world_state: WorldState object to format
+            
+        Returns:
+            Structured dictionary ready for LLM processing
+        """
+        return world_state.to_structured_dict()
 
     def make_decision(self, world_state, personality):
         """

@@ -1,9 +1,12 @@
 """
 Factory for creating character instances with proper configuration.
 """
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from config import LittleWorldConfig, CharacterConfig, load_config
 from .base import PlayerCharacter, AICharacter
+
+if TYPE_CHECKING:
+    from world import World
 
 
 class CharacterFactory:
@@ -48,6 +51,10 @@ class CharacterFactory:
         y: float,
         color: Optional[tuple[int, int, int]] = None,
         character_config: Optional[CharacterConfig] = None,
+        vision_radius: Optional[float] = None,
+        world: Optional["World"] = None,
+        model = None,
+        personality: str = None,
     ) -> AICharacter:
         """
         Create an AI character.
@@ -57,6 +64,8 @@ class CharacterFactory:
             y: Initial y position
             color: Character color. If None, uses config default.
             character_config: Character-specific config. If None, uses config default.
+            vision_radius: Vision radius in pixels. If None, uses default 200.0
+            world: Optional reference to World (for initiative observation mode)
             
         Returns:
             AICharacter instance
@@ -67,5 +76,9 @@ class CharacterFactory:
             config=self.config,
             color=color,
             character_config=character_config,
+            vision_radius=vision_radius,
+            world=world,
+            model=model,
+            personality=personality,
         )
 

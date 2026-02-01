@@ -1,8 +1,8 @@
 
 from pydantic import BaseModel
-from src.language_model.base import LLMBase
-from src.language_model.providers.provider_factory import create_llm_instance
-from src.config.models.character_config import LLMConfig
+from language_model.base import LLMBase
+from language_model.providers.provider_factory import create_llm_instance
+from config.models.character_config import LLMConfig
 from langchain_core.runnables import Runnable
 from openai import AsyncOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
@@ -175,6 +175,4 @@ class LLMChatModel(LLMBase, Runnable):
         new_model.llm = self.llm.bind_tools(tools)
         return new_model
     
-
-
 

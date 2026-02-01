@@ -23,12 +23,25 @@ game:
 # Character instance configurations
 characters:
   player_a:
+    type: player
     name: "Player A"
     # Player characters don't need LLM config
   
   ai_character_a:
+    type: ai
     name: "AI Character A"
+    vision_radius: 200.0
     llm:
       type: openai
       version: gpt-4o
       api_key: ${OPENAI_API_KEY}
+    
+  big_guy_1:
+    type: ai
+    name: "Big Guy 1"
+    vision_radius: 200.0
+    llm:
+      type: openai
+      version: gpt-4o
+      api_key: ${OPENAI_API_KEY}
+    personality: characters_setting/big_guy_1/personality.MD

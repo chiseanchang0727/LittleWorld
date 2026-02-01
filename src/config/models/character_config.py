@@ -16,6 +16,7 @@ class CharacterInstanceConfig(BaseModel):
     """Configuration for a specific character instance."""
     name: str = Field(description="Character name/identifier")
     llm: Optional[LLMConfig] = Field(default=None, description="LLM configuration (for AI characters)")
+    vision_radius: Optional[float] = Field(default=200.0, description="Vision radius in pixels (for AI characters)")
     # Add other character-specific settings here as needed
-    # e.g., personality_file, vision_radius, decision_interval, etc.
+    # e.g., personality_file, decision_interval, etc.
 
